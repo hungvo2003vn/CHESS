@@ -47,10 +47,13 @@ def main():
             # Display the choosen area
             if len(CHESS_GAME.sqClick) == 1:
                 HighlighRect(display_screen, start_col, start_row)
-            
+
             ############ User's turn ############
             # Check if pieces is clicked
             if CHESS_GAME.ai_turn == False:
+                
+                # Undo Button
+                CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
                 
                 # Create Title
                 X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
@@ -91,21 +94,7 @@ def main():
 
             ############ GAME OVER ############
             if game_over:
-                
-                content = "Play Again"
-                width = SCREEN_WIDTH/6
-                height = 50
-                x = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2 - (width)/2
-                y = (SCREEN_HEIGHT)/2 + 50
-                game_over_button = CreateButton(display_screen, x, y, width, height, content, MEDIUM_FONT)
-
-                # Check if button is clicked
-                click, _, _ = pg.mouse.get_pressed()
-                if click == 1:
-                    mouse = pg.mouse.get_pos()
-                    if game_over_button.collidepoint(mouse):
-                        time.sleep(0.2)
-                        CHESS_GAME = ChessBoard()
+                CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
                     
                     
             

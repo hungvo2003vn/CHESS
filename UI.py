@@ -2,6 +2,7 @@ from SETTING import *
 import pygame as pg
 from pygame.locals import *
 import time
+from chessBoard import*
 
 ############## FUNCTION of STARTUP SCREEN ##############
 
@@ -63,3 +64,43 @@ def StartUp(display_screen, CHESS_GAME, LARGE_FONT, MEDIUM_FONT):
 def Valid_HighlighRect(x, y):
 
     return (x in range(0, BOARD_LENGTH) and y in range(0, BOARD_LENGTH))
+
+
+def GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT):
+
+    content = "Play Again"
+    width = SCREEN_WIDTH/6
+    height = 50
+    x = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2 - (width)/2
+    y = (SCREEN_HEIGHT)/2 + 100
+    game_over_button = CreateButton(display_screen, x, y, width, height, content, MEDIUM_FONT)
+
+    # Check if button is clicked
+    click, _, _ = pg.mouse.get_pressed()
+    if click == 1:
+        mouse = pg.mouse.get_pos()
+        if game_over_button.collidepoint(mouse):
+            time.sleep(0.2)
+            CHESS_GAME = ChessBoard()
+
+    return CHESS_GAME
+
+def Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT):
+
+    content = "Undo Move"
+    width = SCREEN_WIDTH/6
+    height = 50
+    x = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2 - (width)/2
+    y = (SCREEN_HEIGHT)/2 + 40
+    game_over_button = CreateButton(display_screen, x, y, width, height, content, MEDIUM_FONT)
+
+    # Check if button is clicked
+    click, _, _ = pg.mouse.get_pressed()
+    if click == 1:
+        mouse = pg.mouse.get_pos()
+        if game_over_button.collidepoint(mouse):
+            time.sleep(0.2)
+            CHESS_GAME.undo_move()
+            CHESS_GAME.undo_move()
+
+    return CHESS_GAME

@@ -17,6 +17,7 @@ class ChessBoard:
         self.ai_turn = False
         self.sqClick = []
         self.sqSelected = []
+        self.Move_logs = []
         
     def make_board(self, display_screen):
         # Draw board
@@ -80,8 +81,49 @@ class ChessBoard:
         if move.isValidMove(self.ai_turn) == False:
             return
         
+        # Add this move to Move_logs
+        self.add_move(move)
+
+        # Make move
         self.PIECES_MAP[move.endRow][move.endCol] = self.PIECES_MAP[move.startRow][move.startCol]
         self.PIECES_MAP[move.startRow][move.startCol] = "--"
+
+        return
+
+    # Move logs
+    def add_move(self, move):
+
+        start_pieces = self.PIECES_MAP[move.startRow][move.startCol]
+        start_pos = [move.startRow, move.startCol]
+
+        end_pieces = self.PIECES_MAP[move.endRow][move.endCol]
+        end_pos = [move.endRow, move.endCol]
+
+        self.Move_logs += [   [[start_pieces, start_pos], [end_pieces, end_pos]]   ]
+
+        return
+    
+    # Undo Move
+    def undo_move(self):
+
+        if len(self.Move_logs) <= 0:
+            return
+        
+        # Get the latest move
+        start_pieces = self.Move_logs[-1][0][0]
+        start_pos = self.Move_logs[-1][0][1]
+
+        end_pieces = self.Move_logs[-1][1][0]
+        end_pos = self.Move_logs[-1][1][1]
+
+        self.Move_logs.pop()
+
+        # Load the old status
+        self.PIECES_MAP[start_pos[0]][start_pos[1]] = start_pieces
+        self.PIECES_MAP[end_pos[0]][end_pos[1]] = end_pieces
+
+        return
+
 
     # Cheking clicked and make_move
     def CheckingClicked(self, pos):
