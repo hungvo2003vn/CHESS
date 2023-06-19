@@ -39,5 +39,5 @@ PIECES = ["bR","bN","bB","bK","bQ","bp",
           "wR","wN","wB","wK","wQ","wp"]
 
 # AI constant
-DEPTH = 1
+DEPTH = 3
 INF = 2
