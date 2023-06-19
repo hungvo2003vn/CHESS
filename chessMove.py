@@ -177,6 +177,9 @@ class Move:
                 moves = case_moves[idx]
 
                 if self.InsideBoard(moves[0], moves[1]) and color != self.PIECES_MAP[moves[0]][moves[1]][0] and able_continue_moving[idx]:
+                    if self.PIECES_MAP[moves[0]][moves[1]][0] != '-':
+                        able_continue_moving[idx] = False
+
                     PossibleMoves += [moves]
                 else:
                     able_continue_moving[idx] = False
@@ -205,6 +208,9 @@ class Move:
                 moves = case_moves[idx]
 
                 if self.InsideBoard(moves[0], moves[1]) and color != self.PIECES_MAP[moves[0]][moves[1]][0] and able_continue_moving[idx]:
+                    if self.PIECES_MAP[moves[0]][moves[1]][0] != '-':
+                        able_continue_moving[idx] = False
+
                     PossibleMoves += [moves]
                 else:
                     able_continue_moving[idx] = False
@@ -233,6 +239,9 @@ class Move:
                 moves = case_moves[idx]
 
                 if self.InsideBoard(moves[0], moves[1]) and color != self.PIECES_MAP[moves[0]][moves[1]][0] and able_continue_moving[idx]:
+                    if self.PIECES_MAP[moves[0]][moves[1]][0] != '-':
+                        able_continue_moving[idx] = False
+                        
                     PossibleMoves += [moves]
                 else:
                     able_continue_moving[idx] = False
@@ -283,24 +292,35 @@ class Move:
             return False
         
         # Check current pieces
-        pieces_name = self.PIECES_MAP[self.startRow][self.startCol][1]
+        pieces = self.PIECES_MAP[self.startRow][self.startCol]
+        PossibleMoves = self.AllPossibleMoves(pieces, ai_turn)
+
+        return [self.endRow, self.endCol] in PossibleMoves
+    
+    # Get PossibleMoves for a single pieces
+    def AllPossibleMoves(self, pieces, ai_turn):
+
+        PossibleMoves = []
+        # Check current pieces
+        pieces_name = pieces[1]
 
         if pieces_name == 'p':
-            return [self.endRow, self.endCol] in self.PawnMoves(ai_turn)
+            PossibleMoves = self.PawnMoves(ai_turn)
         
         if pieces_name == 'K':
-            return [self.endRow, self.endCol] in self.KingMoves()
+            PossibleMoves = self.KingMoves()
         
         if pieces_name == 'Q':
-            return [self.endRow, self.endCol] in self.QueenMoves()
+            PossibleMoves = self.QueenMoves()
 
         if pieces_name == 'R':
-            return [self.endRow, self.endCol] in self.RookMoves()
+            PossibleMoves = self.RookMoves()
         
         if pieces_name == 'B':
-            return [self.endRow, self.endCol] in self.BishopMoves()
+            PossibleMoves = self.BishopMoves()
         
         if pieces_name == 'N':
-            return [self.endRow, self.endCol] in self.KnightMoves()
+            PossibleMoves = self.KnightMoves()
         
-        return True
+        return PossibleMoves
+

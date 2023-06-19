@@ -29,7 +29,7 @@ def CreateTitle(display_screen, x, y, width, height, content, font):
 
     return Title
 
-def HighlighRect(display_screen, x, y):
+def HighlighRect(display_screen, x, y, color, line_width):
 
     if Valid_HighlighRect(x, y) == False:
         return 
@@ -37,7 +37,7 @@ def HighlighRect(display_screen, x, y):
     x = x*CELL_SIZE + X_BOARD
     y = y*CELL_SIZE + Y_BOARD
 
-    pg.draw.rect(display_screen, GREEN_YELLOW, pg.Rect(x, y, CELL_SIZE, CELL_SIZE), 2)
+    pg.draw.rect(display_screen, color, pg.Rect(x, y, CELL_SIZE, CELL_SIZE), line_width)
 
 
 def StartUp(display_screen, CHESS_GAME, LARGE_FONT, MEDIUM_FONT):

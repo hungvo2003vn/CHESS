@@ -88,6 +88,13 @@ class ChessBoard:
         self.PIECES_MAP[move.endRow][move.endCol] = self.PIECES_MAP[move.startRow][move.startCol]
         self.PIECES_MAP[move.startRow][move.startCol] = "--"
 
+        # Queen transform
+        if self.PIECES_MAP[move.endRow][move.endCol][1] == 'p':
+
+            if move.endRow == 0 or move.endRow == (BOARD_LENGTH - 1):
+                color = self.PIECES_MAP[move.endRow][move.endCol][0]
+                self.PIECES_MAP[move.endRow][move.endCol] = color + 'Q'
+
         return
 
     # Move logs
@@ -131,7 +138,7 @@ class ChessBoard:
         start_col = (int)((pos[0] - X_BOARD) // CELL_SIZE)
         start_row = (int)((pos[1] - Y_BOARD) // CELL_SIZE)
 
-        if Valid_HighlighRect(start_col, start_col):
+        if Valid_HighlighRect(start_col, start_row):
 
             # Store move
             self.sqSelected = [start_row, start_col]
@@ -150,7 +157,6 @@ class ChessBoard:
 
                 if player_move.isValidMove(self.ai_turn):
                     self.setPlayer()
-        
         else:
             self.sqSelected = []
             self.sqClick = []
