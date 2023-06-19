@@ -23,6 +23,7 @@ def main():
     #Init user and AI
     CHESS_GAME = ChessBoard()
     game_over = False
+    sleep = False
 
     # POSITION MOUSE
     start_row = None
@@ -41,6 +42,11 @@ def main():
 
         else:
             
+            # Avoid the AI make move too fast
+            if CHESS_GAME.ai_turn == False and len(CHESS_GAME.Move_logs) > 0 and sleep == False:
+                sleep = True
+                time.sleep(0.5)
+
             # Display the updated board
             CHESS_GAME.make_board_all(display_screen)
             pos = None
@@ -88,15 +94,14 @@ def main():
 
             ############ GAME OVER ############
             CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
-            
-            ############ User's turn ############
-            if CHESS_GAME.ai_turn == False:
-                
-                # Undo Button
-                CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
-                
-                if not game_over:
+            # Undo Button
+            CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
 
+            if not game_over:
+                
+                ############ User's turn ############
+                if CHESS_GAME.ai_turn == False:
+                    
                     # Check if pieces is clicked
                     for event in pg.event.get():
                         if event.type == QUIT:
@@ -115,21 +120,18 @@ def main():
                     # CHESS_GAME.make_move(ai_move)
                     # CHESS_GAME.setPlayer()
 
-            ############ AI's turn ############
-            else:
-
-                if not game_over:
-                    time.sleep(0.5)
+                ############ AI's turn ############
+                else:
+                        
                     best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
                     ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
                     
                     CHESS_GAME.make_move(ai_move)
                     CHESS_GAME.setPlayer()
-                    
+                    sleep = False
                     
         # Update after each event
-        #pg.display.update()
-        pg.display.flip()
+        pg.display.update()
 
 if __name__ == "__main__":
     main()
