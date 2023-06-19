@@ -45,50 +45,57 @@ def main():
             CHESS_GAME.make_board_all(display_screen)
             pos = None
             
-            # Display the choosen area
-            if len(CHESS_GAME.sqClick) == 1:
-                HighlighRect(display_screen, start_col, start_row, GREEN_YELLOW, 2)
-            
+            # Display the choosen area of opponent
             if CHESS_GAME.ai_turn is False:
                 
                 if len(CHESS_GAME.Move_logs) > 0:
                     latest_move = CHESS_GAME.Move_logs[-1][1][1]
                     ai_row, ai_col = latest_move[0], latest_move[1]
                     HighlighRect(display_screen, ai_col, ai_row, RED, 5)
+                    
+            # Display the choosen area of user
+            if len(CHESS_GAME.sqClick) == 1:
+                HighlighRect(display_screen, start_col, start_row, GREEN_YELLOW, 2)
+
+                last_click = Move([start_row, start_col], [0,0], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
+                pieces = CHESS_GAME.PIECES_MAP[start_row][start_col]
+                all_poss = last_click.AllPossibleMoves(pieces, CHESS_GAME.ai_turn)
+                for y,x in all_poss:
+                    HighlighRect(display_screen, x, y, GREEN_YELLOW, 5)
+            
+            # Create Title
+            X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
+            Y_content = (SCREEN_HEIGHT)/2
+            Winner = winner(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
+            content = None
 
             ############ Checking Game over ############
             game_over = terminated(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
-            
-            if game_over:
 
-                # Create Title
-                X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
-                Y_content = (SCREEN_HEIGHT)/2
-                Winner = winner(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
-                content = None
-                if Winner is None:
-                    content = "Game Over: Tie!"
+            if game_over:
+                if Winner != "BLACK" and Winner != "WHITE":
+                    content = f"Tie! - {Winner}"
                 elif Winner == CHESS_GAME.user:
                     content = "You Win!"
                 else:
                     content = "You lose!"
+            elif CHESS_GAME.ai_turn == False:
+                content = "Your turn"
+            else:
+                content = "AI's turn..."
 
-                CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
-                # Undo Button
-                CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
+            CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
+
+            ############ GAME OVER ############
+            CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
             
             ############ User's turn ############
-            # Check if pieces is clicked
             if CHESS_GAME.ai_turn == False:
                 
                 # Undo Button
                 CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
                 
                 if not game_over:
-                    # Create Title
-                    X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
-                    Y_content = (SCREEN_HEIGHT)/2
-                    CreateTitle(display_screen, X_content, Y_content, 0, 0, "Your turn", LARGE_FONT)
 
                     # Check if pieces is clicked
                     for event in pg.event.get():
@@ -100,46 +107,29 @@ def main():
                     
                     if pos is not None:
                         pos, start_row, start_col = CHESS_GAME.CheckingClicked(pos)
+                    
+                    # # AI automatic
+                    # best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
+                    # ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
+                    
+                    # CHESS_GAME.make_move(ai_move)
+                    # CHESS_GAME.setPlayer()
 
             ############ AI's turn ############
             else:
 
                 if not game_over:
-                    
-                    # Create Title
-                    X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
-                    Y_content = (SCREEN_HEIGHT)/2
-                    content = "AI's turn" + "..."
-                    
-                    CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
-
-                    # Check if pieces is clicked
-                    # for event in pg.event.get():
-                    #     if event.type == QUIT:
-                    #         pg.quit()
-                    #         sys.exit()
-                    #     elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                    #         pos = pg.mouse.get_pos()
-                    
-                    # if pos is not None:
-                    #     pos, start_row, start_col = CHESS_GAME.CheckingClicked(pos)
-                    
-                    Possible_actions = actions(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn)
-                    best_move = random.choice(Possible_actions)
-
-                    #best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
+                    time.sleep(0.5)
+                    best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
                     ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
                     
                     CHESS_GAME.make_move(ai_move)
                     CHESS_GAME.setPlayer()
-
                     
-            ############ GAME OVER ############
-            CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
                     
-            
         # Update after each event
-        pg.display.update()
+        #pg.display.update()
+        pg.display.flip()
 
 if __name__ == "__main__":
     main()

@@ -94,7 +94,7 @@ class ChessBoard:
             if move.endRow == 0 or move.endRow == (BOARD_LENGTH - 1):
                 color = self.PIECES_MAP[move.endRow][move.endCol][0]
                 self.PIECES_MAP[move.endRow][move.endCol] = color + 'Q'
-
+        
         return
 
     # Move logs
@@ -134,7 +134,7 @@ class ChessBoard:
 
     # Cheking clicked and make_move
     def CheckingClicked(self, pos):
-    
+
         start_col = (int)((pos[0] - X_BOARD) // CELL_SIZE)
         start_row = (int)((pos[1] - Y_BOARD) // CELL_SIZE)
 

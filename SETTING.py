@@ -37,3 +37,7 @@ PIECES_MAP = [
 # Chess pieces
 PIECES = ["bR","bN","bB","bK","bQ","bp",
           "wR","wN","wB","wK","wQ","wp"]
+
+# AI constant
+DEPTH = 1
+INF = 2

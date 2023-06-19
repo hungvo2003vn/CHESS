@@ -5,8 +5,6 @@ import copy
 import random
 
 # Always use the deepcopy
-DEPTH = 10
-INF = 2
 
 ########## Helper function for winner ##########
 def isStaleMate(board, white_turn, ai_turn):
@@ -158,7 +156,7 @@ def has_insufficient_material(board):
 def winner(board, white_turn, ai_turn, Move_logs):
 
     if isTie(Move_logs):
-        return "Tie"
+        return "50R"
     
     if isCheckMate(board, white_turn):
         if white_turn:
@@ -167,10 +165,10 @@ def winner(board, white_turn, ai_turn, Move_logs):
             return "WHITE"
     
     if isStaleMate(board, white_turn, ai_turn):
-        return "Tie"
+        return "STM"
     
     if has_insufficient_material(board):
-        return "Tie"
+        return "IM"
     
     return None
 
