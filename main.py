@@ -123,11 +123,15 @@ async def main():
                     if click == 1 and (len(queue_event) == 0 or len(CHESS_GAME.sqClick) == 1):
                         pos = pg.mouse.get_pos()
 
-                        if pos in queue_event:
-                            queue_event += [pos]
+                        r = (int)((pos[1] - Y_BOARD) // CELL_SIZE)
+                        c = (int)((pos[0] - X_BOARD) // CELL_SIZE)
+                        position = [r,c]
+
+                        if position in queue_event:
+                            queue_event += [position]
                             pos = None
                         else:
-                            queue_event += [pos]
+                            queue_event += [position]
                     
                     # Collect clicked position
                     if pos is not None:
