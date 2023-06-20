@@ -56,10 +56,13 @@ class Agent:
 
     def isTie(self):
 
+        if len(self.Move_logs) < 50:
+            return False
+        
         # Check for a tie based on the 50-move rule
         consecutive_non_capture_moves = 0
 
-        for move in self.Move_logs:
+        for move in self.Move_logs[-50:]:
 
             piece = move[0][0] #Piece of the start_pos
 
@@ -163,15 +166,15 @@ class Agent:
 
     ########## Main function for Minimax Algorithm ##########
     def winner(self):
-
-        if self.isTie():
-            return "50R"
         
         if self.isCheckMate():
             if self.white_turn:
                 return "BLACK"
             else:
                 return "WHITE"
+            
+        if self.isTie():
+            return "50R"
         
         if self.isStaleMate():
             return "STM"
@@ -256,81 +259,90 @@ class Agent:
 
     def utility(self):
 
+        evaluate = 0
+
         Winner = self.winner()
-        if Winner == "White": # Max player
-            return 1
-        elif Winner == "Black": # Min player
-            return -1
+        if Winner == "WHITE": # Max player
+            evaluate += 1000
+        elif Winner == "BLACK": # Min player
+            evaluate -= 1000
         
-        return 0
+
+        for row in range(0, BOARD_LENGTH):
+            for col in range(0, BOARD_LENGTH):
+                pieces = self.board[row][col]
+                if pieces == "--":
+                    continue
+
+                if pieces[0] == 'w':
+                    evaluate += SQUARE_TABLE[pieces][row][col] + POWER[pieces[1]]
+                else:
+                    evaluate -= (SQUARE_TABLE[pieces][row][col] + POWER[pieces[1]])
+        
+        if self.ai_turn == self.white_turn: # AI is WHITE
+            if not self.ai_turn: # This is user's turn
+                evaluate = -evaluate # BLACK - WHITE
+        else: # AI is BLACK
+            if self.ai_turn: # This is ai's turn
+                evaluate = -evaluate # BLACK - WHITE
+
+        return evaluate
 
 
 #################### IMPLEMENT THE ALGORITHM ####################
-def minimax(board, white_turn, ai_turn, Move_logs):
+# alpha = Finding Max
+# beta = Finding Min
+def minimax(board, white_turn, ai_turn, Move_logs, depth = DEPTH, alpha = -INF, beta = INF):
+    
+    AGENT = Agent(board, white_turn, ai_turn, Move_logs)
 
+    if depth == 0 or AGENT.terminated():
+        return [AGENT.utility(), None]
+
+    Possible_actions = AGENT.actions()
     optimal_action = None
 
-    if white_turn:
-        optimal_action = max_player(board, white_turn, ai_turn, Move_logs)[1]
-    else:
-        optimal_action = min_player(board, white_turn, ai_turn, Move_logs)[1]
+    if not ai_turn: # This is user's turn (Maxplayer)
+        
+        max_value = -INF
+
+        for move in Possible_actions:
+            
+            if alpha >= beta:
+                break
+
+            next_board, next_Move_logs = AGENT.result(move)
+
+            next_player_set = minimax(next_board, not white_turn, not ai_turn, next_Move_logs, depth - 1, alpha, beta)
+
+            if max_value < next_player_set[0]:
+                max_value = next_player_set[0]
+                optimal_action = move
+
+            alpha = max(alpha, max_value)
+
+        
+        return [max_value, optimal_action]
+
+
+    else: # This is AI's turn (Minplayer)
+
+        min_value = INF
+
+        for move in Possible_actions:
+            
+            if alpha >= beta:
+                break
+
+            next_board, next_Move_logs = AGENT.result(move)
+            next_player_set = minimax(next_board, not white_turn, not ai_turn, next_Move_logs, depth - 1, alpha, beta)
+
+            if min_value > next_player_set[0]:
+                min_value = next_player_set[0]
+                optimal_action = move
+
+            beta = min(beta, min_value)
+        
+        return [min_value, optimal_action]
     
-    return optimal_action
-
-
-def max_player(board, white_turn, ai_turn, Move_logs, min_value = INF, depth = DEPTH):
-    
-    AGENT = Agent(board, white_turn, ai_turn, Move_logs)
-    Possible_actions = AGENT.actions()
-    max_value = -INF
-    best_move = None
-
-    if depth == 0 or AGENT.terminated():
-        return [AGENT.utility(), None]
-
-    while len(Possible_actions) > 0:
-
-        if max_value >= min_value:
-            break
-
-        move = random.choice(Possible_actions)
-        Possible_actions.remove(move)
-        next_board, next_Move_logs = AGENT.result(move)
-
-        next_player_set = min_player(next_board, not white_turn, not ai_turn, next_Move_logs, max_value, depth - 1)
-        if max_value < next_player_set[0]:
-            max_value = next_player_set[0]
-            best_move = move
-
-    return [max_value, best_move]
-
-    
-
-def min_player(board, white_turn, ai_turn, Move_logs, max_value = -INF, depth = DEPTH):
-    
-    AGENT = Agent(board, white_turn, ai_turn, Move_logs)
-    Possible_actions = AGENT.actions()
-    min_value = INF
-    best_move = None
-
-    if depth == 0 or AGENT.terminated():
-        return [AGENT.utility(), None]
-
-
-    while len(Possible_actions) > 0:
-
-        if max_value >= min_value:
-            break
-
-        move = random.choice(Possible_actions)
-        Possible_actions.remove(move)
-        next_board, next_Move_logs = AGENT.result(move)
-
-        next_player_set = max_player(next_board, not white_turn, not ai_turn, next_Move_logs, min_value, depth - 1)
-
-        if min_value > next_player_set[0]:
-            min_value = next_player_set[0]
-            best_move = move
-
-    return [max_value, best_move]
     

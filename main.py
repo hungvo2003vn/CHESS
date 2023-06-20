@@ -5,6 +5,7 @@ from SETTING import *
 from UI import *
 from chessBoard import *
 from chessEngine import *
+import asyncio
 
 # Init pygame
 pg.init()
@@ -18,7 +19,8 @@ MEDIUM_FONT = pg.font.Font("OpenSans-Regular.ttf", 28)
 LARGE_FONT = pg.font.Font("OpenSans-Regular.ttf", 40)
 MOVE_FONT = pg.font.Font("OpenSans-Regular.ttf", 60)
 
-def main():
+
+async def main():
 
     #Init user and AI
     CHESS_GAME = ChessBoard()
@@ -27,6 +29,7 @@ def main():
     # POSITION MOUSE
     start_row = None
     start_col = None
+    queue_event = []
 
     # Title 
     X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
@@ -36,7 +39,7 @@ def main():
     while True:
 
         #Update the display_screen
-        pg.display.update()
+        #pg.display.update()
 
         for event in pg.event.get():
             if event.type == QUIT:
@@ -46,7 +49,12 @@ def main():
         display_screen.fill(BLACK)
 
         if CHESS_GAME.user is None:
+
             StartUp(display_screen, CHESS_GAME, LARGE_FONT, MEDIUM_FONT)
+            start_row = None
+            start_col = None
+            queue_event = []
+            content = None
 
         else:
             
@@ -103,22 +111,35 @@ def main():
                     CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
                     pg.display.update()
 
-                    # Check if pieces is clicked
-                    for event in pg.event.get():
-                        if event.type == QUIT:
-                            pg.quit()
-                            sys.exit()
-                        elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
-                            pos = pg.mouse.get_pos()
+                    # # Check if pieces is clicked
+                    # for event in pg.event.get():
+                    #     if event.type == QUIT:
+                    #         pg.quit()
+                    #         sys.exit()
+                    #     elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
+                    #         pos = pg.mouse.get_pos()
+
+
                     
+                    click = pg.mouse.get_pressed()[0]
+                    if click == 1 and (len(queue_event) == 0 or len(CHESS_GAME.sqClick) == 1):
+                        pos = pg.mouse.get_pos()
+
+                        if pos in queue_event:
+                            queue_event += [pos]
+                            pos = None
+                        else:
+                            queue_event += [pos]
+
                     if pos is not None:
                         pos, start_row, start_col = CHESS_GAME.CheckingClicked(pos)
                     
-                    # if CHESS_GAME.ai_turn:
-                    #     CHESS_GAME.make_board_all(display_screen)
+                    if CHESS_GAME.ai_turn or (len(queue_event) > 0 and CHESS_GAME.sqClick == []):
+                        queue_event = []
+                        CHESS_GAME.make_board_all(display_screen)
                     
                     # # AI automatic
-                    # best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
+                    # best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)[1]
                     # ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
                     
                     # CHESS_GAME.make_move(ai_move)
@@ -134,14 +155,15 @@ def main():
                     
                     # Make decision
                     time.sleep(0.5)
-                    best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
+                    best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)[1]
                     ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
                     
                     CHESS_GAME.make_move(ai_move)
                     CHESS_GAME.setPlayer()
             
         # Update after each event
-        # pg.display.update()
+        pg.display.update()
+        await asyncio.sleep(0)
 
-if __name__ == "__main__":
-    main()
+
+asyncio.run(main())
