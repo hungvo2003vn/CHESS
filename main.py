@@ -12,7 +12,7 @@ pg.init()
 pg.display.set_caption("Chess")
 
 display_screen = pg.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))
-
+clock = pg.time.Clock()
 
 #Font size
 MEDIUM_FONT = pg.font.Font("OpenSans-Regular.ttf", 28)
@@ -37,9 +37,6 @@ async def main():
     content = None
 
     while True:
-
-        #Update the display_screen
-        #pg.display.update()
 
         for event in pg.event.get():
             if event.type == QUIT:
@@ -100,7 +97,7 @@ async def main():
             CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
             # Undo Button
             CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
-
+            
             if not game_over:
 
                 ############ User's turn ############
@@ -110,6 +107,7 @@ async def main():
                     content = "Your turn"
                     CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
                     pg.display.update()
+                    await asyncio.sleep(0)
 
                     # # Check if pieces is clicked
                     # for event in pg.event.get():
@@ -118,9 +116,9 @@ async def main():
                     #         sys.exit()
                     #     elif event.type == pg.MOUSEBUTTONDOWN and event.button == 1:
                     #         pos = pg.mouse.get_pos()
+                    # await asyncio.sleep(0)
 
-
-                    
+                    # Check if pieces is clicked
                     click = pg.mouse.get_pressed()[0]
                     if click == 1 and (len(queue_event) == 0 or len(CHESS_GAME.sqClick) == 1):
                         pos = pg.mouse.get_pos()
@@ -130,20 +128,14 @@ async def main():
                             pos = None
                         else:
                             queue_event += [pos]
-
+                    
+                    # Collect clicked position
                     if pos is not None:
                         pos, start_row, start_col = CHESS_GAME.CheckingClicked(pos)
                     
+                    # Update the table or reset queue_event
                     if CHESS_GAME.ai_turn or (len(queue_event) > 0 and CHESS_GAME.sqClick == []):
                         queue_event = []
-                        CHESS_GAME.make_board_all(display_screen)
-                    
-                    # # AI automatic
-                    # best_move = minimax(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)[1]
-                    # ai_move = Move(best_move[0], best_move[1], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
-                    
-                    # CHESS_GAME.make_move(ai_move)
-                    # CHESS_GAME.setPlayer()
 
                 ############ AI's turn ############
                 else:
@@ -152,6 +144,7 @@ async def main():
                     content = "AI's turn..."
                     CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
                     pg.display.update()
+                    await asyncio.sleep(0)
                     
                     # Make decision
                     time.sleep(0.5)
