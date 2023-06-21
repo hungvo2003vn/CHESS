@@ -54,10 +54,10 @@ def StartUp(display_screen, CHESS_GAME, LARGE_FONT, MEDIUM_FONT):
         if play_white.collidepoint(mouse):
             time.sleep(0.2)
             CHESS_GAME.user = "WHITE"
-            CHESS_GAME.white_turn = True
         elif play_black.collidepoint(mouse):
             time.sleep(0.2)
             CHESS_GAME.user = "BLACK"
+            CHESS_GAME.ai_turn = True
 
     return
 

@@ -68,13 +68,16 @@ async def main():
                     
             # Display the choosen area of user
             if len(CHESS_GAME.sqClick) == 1:
-                HighlighRect(display_screen, start_col, start_row, GREEN_YELLOW, 2)
+                
+                if CHESS_GAME.verify_click(start_row, start_col):
+                    
+                    HighlighRect(display_screen, start_col, start_row, GREEN_YELLOW, 2)
 
-                last_click = Move([start_row, start_col], [0,0], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
-                pieces = CHESS_GAME.PIECES_MAP[start_row][start_col]
-                all_poss = last_click.AllPossibleMoves(pieces, CHESS_GAME.ai_turn)
-                for y,x in all_poss:
-                    HighlighRect(display_screen, x, y, GREEN_YELLOW, 5)
+                    last_click = Move([start_row, start_col], [0,0], CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn)
+                    pieces = CHESS_GAME.PIECES_MAP[start_row][start_col]
+                    all_poss = last_click.AllPossibleMoves(pieces, CHESS_GAME.ai_turn)
+                    for y,x in all_poss:
+                        HighlighRect(display_screen, x, y, GREEN_YELLOW, 5)
             
             # Get Winner
             AGENT = Agent(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
@@ -97,6 +100,13 @@ async def main():
             CHESS_GAME = GameOver_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
             # Undo Button
             CHESS_GAME = Undo_Button(display_screen, CHESS_GAME, MEDIUM_FONT)
+
+            # Release ai_turn if undo to first state and ai is white side
+            if len(CHESS_GAME.Move_logs) == 0 and CHESS_GAME.white_turn == CHESS_GAME.ai_turn and not CHESS_GAME.ai_turn:
+                CHESS_GAME.setPlayer()
+                pg.display.update()
+                await asyncio.sleep(0)
+                continue
             
             if not game_over:
 
@@ -128,7 +138,6 @@ async def main():
                         position = [r,c]
 
                         if position in queue_event:
-                            queue_event += [position]
                             pos = None
                         else:
                             queue_event += [position]

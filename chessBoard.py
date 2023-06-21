@@ -11,7 +11,7 @@ class ChessBoard:
         self.CHESS_BOARD = None
         self.PIECES_MAP = copy.deepcopy(PIECES_MAP)
         self.flipped = False
-        self.white_turn = False
+        self.white_turn = True
 
         self.user = None
         self.ai_turn = False
@@ -171,6 +171,16 @@ class ChessBoard:
 
         return
     
+    def verify_click(self, start_row, start_col):
+
+        user_color = None
+        piece_clicked = self.PIECES_MAP[start_row][start_col][0]
+        if self.ai_turn == self.white_turn:
+            user_color = 'b'
+        else:
+            user_color = 'w'
+        
+        return piece_clicked == '-' or user_color == piece_clicked
 
 def Valid_HighlighRect(x, y):
 
