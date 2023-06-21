@@ -40,6 +40,39 @@ class Agent:
 
         return True
 
+    def isCheck(self):
+
+        opponent_color = None
+        if self.ai_turn:
+            if self.ai_turn == self.white_turn:
+                opponent_color = 'b'
+            else:
+                opponent_color = 'w'
+        else:
+            if self.ai_turn == self.white_turn:
+                opponent_color = 'w'
+            else:
+                opponent_color = 'b'
+        
+        # Traverse through the board
+        for row in range(BOARD_LENGTH):
+            for col in range(BOARD_LENGTH):
+
+                pieces = self.board[row][col]
+                if pieces[0] != opponent_color:
+                    continue
+
+                opponent_move = Move([row, col], [0, 0], self.board, not self.white_turn)
+                PossibleMoves = opponent_move.AllPossibleMoves(pieces, not self.ai_turn)
+
+                # If opponent is checking return True
+                for end_pos in PossibleMoves:
+                    end_pieces = self.board[end_pos[0]][end_pos[1]]
+                    if end_pieces[1] == 'K':
+                        return True
+        
+        return False
+
     def isCheckMate(self):
 
         kingCheck = None

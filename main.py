@@ -35,6 +35,8 @@ async def main():
     X_content = (X_BOARD + BOARD_LENGTH*CELL_SIZE + SCREEN_WIDTH)/2
     Y_content = (SCREEN_HEIGHT)/2
     content = None
+    check_content = ""
+    offset_content = 0
 
     while True:
 
@@ -52,6 +54,8 @@ async def main():
             start_col = None
             queue_event = []
             content = None
+            check_content = ""
+            offset_content = 0
 
         else:
             
@@ -82,6 +86,12 @@ async def main():
             # Get Winner
             AGENT = Agent(CHESS_GAME.PIECES_MAP, CHESS_GAME.white_turn, CHESS_GAME.ai_turn, CHESS_GAME.Move_logs)
             Winner = AGENT.winner()
+            if AGENT.isCheck():
+                check_content = " is Checked!"
+                offset_content = 50
+            else:
+                check_content = ""
+                offset_content = 0
 
             ############ Checking Game over ############
             game_over = AGENT.terminated()
@@ -115,7 +125,8 @@ async def main():
                     
                     # Create Title
                     content = "Your turn"
-                    CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
+                    CreateTitle(display_screen, X_content, Y_content - offset_content, 0, 0, content, LARGE_FONT)
+                    CreateTitle(display_screen, X_content, Y_content, 0, 0, check_content, LARGE_FONT)
                     pg.display.update()
                     await asyncio.sleep(0)
 
@@ -155,7 +166,8 @@ async def main():
                     
                     # Create Title
                     content = "AI's turn..."
-                    CreateTitle(display_screen, X_content, Y_content, 0, 0, content, LARGE_FONT)
+                    CreateTitle(display_screen, X_content, Y_content - offset_content, 0, 0, content, LARGE_FONT)
+                    CreateTitle(display_screen, X_content, Y_content, 0, 0, check_content, LARGE_FONT)
                     pg.display.update()
                     await asyncio.sleep(0)
                     
